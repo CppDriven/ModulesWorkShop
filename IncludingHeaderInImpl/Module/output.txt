@@ -1,0 +1,36 @@
+gcc:
+
+/usr/include/c++/15/bits/move.h:228: confused by earlier errors, bailing out
+ninja: build stopped: subcommand failed.
+
+
+
+put the include before, but not yet a global module fragment
+
+/home/lieven/Teaching/Modules/AppContainingModule/IncludingHeaderInImpl/Module/src/Numbers2.cpp:5:1: error: module-declaration only permitted as first declaration, or ending a global module fragment
+    5 | module Numbers;
+      | ^~~~~~
+
+
+
+clang:
+/home/lieven/Teaching/Modules/AppContainingModule/IncludingHeaderInImpl/Module/src/Numbers2.cpp:7:10: warning: '#include <filename>' attaches the declarations to the named module 'Numbers', which is not usually intended; consider moving that directive before the module declaration [-Winclude-angled-in-module-purview]
+    7 | #include <algorithm>
+
+and much more noise
+
+
+put the include before, but not yet a global module fragment
+/home/lieven/Teaching/Modules/AppContainingModule/IncludingHeaderInImpl/Module/src/Numbers2.cpp:5:1: error: module declaration must occur at the start of the translation unit
+    5 | module Numbers;
+      | ^
+/home/lieven/Teaching/Modules/AppContainingModule/IncludingHeaderInImpl/Module/src/Numbers2.cpp:3:1: note: add 'module;' to the start of the file to introduce a global module fragment
+    3 | #include <algorithm>
+      | ^
+1 error generated.
+
+
+
+
+
+on both, when doen correctly, but still having the include after the module Numbers; ==> both compile

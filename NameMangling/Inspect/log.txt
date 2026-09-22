@@ -1,0 +1,206 @@
+
+void foo() {}
+
+void foo(int x) {(void)x;}
+
+void foo(int x, double d) {(void)x; (void)d;}
+
+===>
+nm build/Release/CMakeFiles/Inspect.dir/src/main.cpp.o
+0000000000000000 T main
+0000000000000010 T _Z3fooi
+0000000000000020 T _Z3fooid
+0000000000000000 T _Z3foov
+
+
+===>
+
+c++filt main
+main
+
+c++filt _Z3fooi
+foo(int)
+
+c++filt _Z3fooid
+foo(int, double)
+
+c++filt _Z3foov
+foo()
+
+// we got the hang of it ...
+c++filt _Z3fooiiiiddddd
+foo(int, int, int, int, double, double, double, double, double)
+
+let's put things also in a namespace
+
+
+0000000000000000 T main
+0000000000000010 T _Z3fooi
+0000000000000020 T _Z3fooid
+0000000000000000 T _Z3foov
+0000000000000040 T _ZN5NsOne3fooEi
+0000000000000050 T _ZN5NsOne3fooEid
+0000000000000030 T _ZN5NsOne3fooEv
+0000000000000070 T _ZN5NsTwo3fooEi
+0000000000000080 T _ZN5NsTwo3fooEid
+0000000000000060 T _ZN5NsTwo3fooEv
+
+c++filt _ZN5NsOne3fooEid
+NsOne::foo(int, double)
+c++filt _ZN5NsTwo3fooEid
+NsTwo::foo(int, double)
+
+
+nm --demangle build/Release/CMakeFiles/Inspect.dir/src/main.cpp.o
+0000000000000000 T main
+0000000000000010 T foo(int)
+0000000000000020 T foo(int, double)
+0000000000000000 T foo()
+0000000000000040 T NsOne::foo(int)
+0000000000000050 T NsOne::foo(int, double)
+0000000000000030 T NsOne::foo()
+0000000000000070 T NsTwo::foo(int)
+0000000000000080 T NsTwo::foo(int, double)
+0000000000000060 T NsTwo::foo()
+
+
+
+let's have them as members function of 2 classes (Debug needed, otherwise inlined, and code needed to call the method)
+
+0000000000000060 T main
+0000000000000007 T _Z3fooi
+0000000000000011 T _Z3fooid
+0000000000000000 T _Z3foov
+0000000000000027 T _ZN5NsOne3fooEi
+0000000000000031 T _ZN5NsOne3fooEid
+0000000000000020 T _ZN5NsOne3fooEv
+0000000000000047 T _ZN5NsTwo3fooEi
+0000000000000051 T _ZN5NsTwo3fooEid
+0000000000000040 T _ZN5NsTwo3fooEv
+0000000000000000 W _ZN6ClassA3fooEid
+0000000000000000 W _ZN6ClassB3fooEid
+
+0000000000000060 T main
+0000000000000007 T foo(int)
+0000000000000011 T foo(int, double)
+0000000000000000 T foo()
+0000000000000027 T NsOne::foo(int)
+0000000000000031 T NsOne::foo(int, double)
+0000000000000020 T NsOne::foo()
+0000000000000047 T NsTwo::foo(int)
+0000000000000051 T NsTwo::foo(int, double)
+0000000000000040 T NsTwo::foo()
+0000000000000000 W ClassA::foo(int, double)
+0000000000000000 W ClassB::foo(int, double)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gcc-15
+======
+nm main.cpp.o
+0000000000000000 T main
+                 U _ZN7NumbersW7Numbers7absDiffEii
+                 U _ZN7NumbersW7Numbers9squareMaxEii
+
+nm Numbers.cpp.o
+0000000000000000 B _ZN3barW7Numbers1bE
+0000000000000040 T _ZN3barW7Numbers9function2Ev
+0000000000000008 B _ZN3fooW7Numbers1xE
+0000000000000030 T _ZN3fooW7Numbers9function1Ev
+0000000000000000 T _ZN7Numbers7DetailsW7Numbers5MyMaxEii
+0000000000000010 T _ZN7NumbersW7Numbers7absDiffEii
+0000000000000020 T _ZN7NumbersW7Numbers9squareMaxEii
+0000000000000004 B _ZW7Numbers1a
+000000000000000c B _ZW7Numbers1y
+
+
+
+c++filt _ZGIW7Numbers
+initializer for module Numbers
+
+c++filt _ZN7NumbersW7Numbers7absDiffEii
+Numbers::absDiff@Numbers(int, int)
+
+c++filt _ZN7NumbersW7Numbers9squareMaxEii
+Numbers::squareMax@Numbers(int, int)
+
+
+c++filt _ZN7Numbers7DetailsW7Numbers5MyMaxEii
+Numbers::Details::MyMax@Numbers(int, int)
+
+c++filt _ZN3fooW7Numbers1xE
+foo::x@Numbers
+
+c++filt _ZW7Numbers1y
+y@Numbers
+
+c++filt _ZN3barW7Numbers1bE
+bar::b@Numbers
+
+c++filt _ZW7Numbers1a
+a@Numbers
+
+c++filt _ZN3fooW7Numbers9function1Ev
+foo::function1@Numbers()
+
+c++filt _ZN3barW7Numbers9function2Ev
+bar::function2@Numbers()
+
+
+
+everything is @numbers:
+    * exported
+    * NOT exported
+
+
+Self dissecting:
+namespace bar/foo (not in numbers namespace)   so 'module' seems to be just in front the deepest symbol (b ,x , a ,y ,functio1, functio2, mymax, adDiff, squareMax)
+0000000000000000 B _ZN3barW7     Numbers1bE         Numbers is here module
+0000000000000008 B _ZN3fooW7     Numbers1xE         Numbers is here module
+both in global namespace
+0000000000000004 B _ZW7         Numbers1a           Numbers is here module
+000000000000000c B _ZW7         Numbers1y           Numbers is here module
+
+0000000000000040 T _ZN3barW7    Numbers9function2Ev Numbers is here module
+0000000000000030 T _ZN3fooW7    Numbers9function1Ev Numbers is here module
+
+
+0000000000000000 T _ZN7Numbers  7DetailsW7  Numbers5MyMaxEii
+0000000000000010 T _ZN7Numbers  W7          Numbers7absDiffEii
+0000000000000020 T _ZN7Numbers  W7          Numbers9squareMaxEii
+                    namespace               module
+
+
+MOST probably clang ??and MSVC?? will not add @module for exported items .... ==> yes it does, so the fact clang once did not (according to Daniela is obsolete)
+clang 22.1.5
+0000000000000000 T _ZGIW7Numbers
+000000000000000c B _ZN3barW7Numbers1bE
+0000000000000040 T _ZN3barW7Numbers9function2Ev
+0000000000000004 B _ZN3fooW7Numbers1xE
+0000000000000030 T _ZN3fooW7Numbers9function1Ev
+0000000000000000 T _ZN7Numbers7DetailsW7Numbers5MyMaxEii
+0000000000000010 T _ZN7NumbersW7Numbers7absDiffEii
+0000000000000020 T _ZN7NumbersW7Numbers9squareMaxEii
+0000000000000008 B _ZW7Numbers1a
+0000000000000000 B _ZW7Numbers1y
+
+c++filt _ZN7NumbersW7Numbers9squareMaxEii
+Numbers::squareMax@Numbers(int, int)
+
+c++filt _ZN7Numbers7DetailsW7Numbers5MyMaxEii
+Numbers::Details::MyMax@Numbers(int, int)
+
+
