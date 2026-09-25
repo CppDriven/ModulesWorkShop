@@ -49,3 +49,5 @@ add_subdirectory(IncludingHeaderInInterface)
 add_subdirectory(IncludingHeaderInInterfaceAndImplementationToUsingStd)
 
 add_subdirectory(NameMangling)
+
+add_subdirectory(MigrateToUsingStd)
