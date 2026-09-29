@@ -51,3 +51,7 @@ add_subdirectory(IncludingHeaderInInterfaceAndImplementationToUsingStd)
 add_subdirectory(NameMangling)
 
 add_subdirectory(MigrateToUsingStd)
+
+add_subdirectory(InterfacePartition)
+
+#add_subdirectory(Test)
