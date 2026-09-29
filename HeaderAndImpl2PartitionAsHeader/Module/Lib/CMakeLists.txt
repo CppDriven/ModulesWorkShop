@@ -10,5 +10,7 @@ target_sources(LibraryImpl2PartitionModuleAsHeader
     PUBLIC
         FILE_SET CXX_MODULES FILES
             src/Numbers.cpp
+    PRIVATE
+        FILE_SET internal TYPE CXX_MODULES FILES
             src/Helperh.cpp
 )

@@ -18,7 +18,7 @@ std::vector<std::string> doubleString(const std::string& input)
 std::string reverse(const std::string& input)
 {
     auto result = input;
-    std::reverse(result.begin(), result.end());
+    std::ranges::reverse(result);
     return result;
 }
 

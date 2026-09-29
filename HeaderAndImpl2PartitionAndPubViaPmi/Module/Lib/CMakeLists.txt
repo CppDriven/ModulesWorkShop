@@ -9,5 +9,6 @@ target_sources(LibraryImpl2PartitionModuleAndPubViaPmi
     PUBLIC
         FILE_SET CXX_MODULES FILES
             src/Numbers.cpp
-            src/Helper.cpp
+            src/Helper.cpp      # is required not in the PUBLIC section (really needed or shortcoming of cmake ? )
 )
+
